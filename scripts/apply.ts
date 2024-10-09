@@ -47,7 +47,7 @@ const askForPauseInput = async () => {
     email: config.LINKEDIN_EMAIL,
     password: config.LINKEDIN_PASSWORD
   });
-
+  await wait(20000); //for two factor auth
   askForPauseInput();
 
   const linkGenerator = fetchJobLinksUser({
@@ -63,15 +63,17 @@ const askForPauseInput = async () => {
     jobDescription: config.JOB_DESCRIPTION,
     jobDescriptionLanguages: config.JOB_DESCRIPTION_LANGUAGES
   });
-
+  await wait(2000);
   let applicationPage: Page | null = null;
 
   for await (const [link, title, companyName] of linkGenerator) {
     if (!applicationPage || process.env.SINGLE_PAGE !== "true")
       applicationPage = await context.newPage();
-
+console.log("context new page")
+await wait(1000);
     await applicationPage.bringToFront();
-
+    await wait(1000);
+console.log("bring to front")
     try {
       const formData: ApplicationFormData = {
         phone: config.PHONE,
@@ -85,7 +87,7 @@ const askForPauseInput = async () => {
         textFields: config.TEXT_FIELDS,
         multipleChoiceFields: config.MULTIPLE_CHOICE_FIELDS,
       };
-
+console.log("filled form data?")
       await apply({
         page: applicationPage,
         link,
@@ -94,8 +96,8 @@ const askForPauseInput = async () => {
       });
 
       console.log(`Applied to ${title} at ${companyName}`);
-    } catch {
-      console.log(`Error applying to ${title} at ${companyName}`);
+    } catch(e) {
+      console.log(`Error applying to ${title} at ${companyName},${e}`);
     }
 
     await listingPage.bringToFront();

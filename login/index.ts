@@ -28,7 +28,7 @@ async function login({ page, email, password }: Params): Promise<void> {
     await ask('Please solve the captcha and then press enter');
     await page.goto('https://www.linkedin.com/', { waitUntil: 'load' });
   }
-
+  setTimeout(() => { }, 10000)
   console.log('Logged in to LinkedIn');
 
   await page.click(selectors.skipButton).catch(() => { });

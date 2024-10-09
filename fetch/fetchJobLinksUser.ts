@@ -92,16 +92,19 @@ async function* fetchJobLinksUser({ page, location, keywords, workplace, jobTitl
 
         await page.waitForSelector(selectors.jobDescription, { timeout: 10000 });
         const jobDescriptionText = await page.$eval(selectors.jobDescription, (el) => (el as HTMLElement).innerText.trim());
-        const companyName = await jobListings[i].$eval(selectors.searchResultListItemCompanyName, (el) => (el as HTMLElement).innerText.trim());
-
+        console.log('joblisting:',jobListings[i]);
+       const companyName = await jobListings[i].$eval(selectors.searchResultListItemCompanyName, (el) => (el as HTMLElement).innerText.trim()).catch(() => 'Unknown');
+      // const companyName = await page.$eval(`${selectors.searchResultListItem}:nth-child(${i + 1}) ${selectors.searchResultListItemCompanyName}`, el => (el as HTMLElement).innerText).catch(() => 'Unknown');;
         const canApply = !!(await page.$(selectors.easyApplyButtonEnabled));
         const detectedLanguage = languageDetector.detect(jobDescriptionText, 1)[0][0];
         const matchesLanguage = jobDescriptionLanguages.includes('any') || jobDescriptionLanguages.includes(detectedLanguage);
-
+        console.log("canapply?",canApply,companyName)
+        console.log(canApply,jobTitleRegExp.test(title), jobDescriptionRegExp.test(jobDescriptionText), matchesLanguage)
         if (canApply && jobTitleRegExp.test(title) && jobDescriptionRegExp.test(jobDescriptionText) && matchesLanguage) {
           numMatchingJobs++;
           yield [link, title, companyName];
         }
+       await wait(2000);
       } catch (error) {
         console.error('Error processing job listing:', error);
       }

@@ -30,7 +30,6 @@ async function fillFields(page: Page, formData: ApplicationFormData): Promise<vo
   const booleans = formData.booleans;
 
   booleans['sponsorship'] = formData.requiresVisaSponsorship;
-
   await fillBoolean(page, booleans).catch(console.log);
 
   const multipleChoiceFields = {
